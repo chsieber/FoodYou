@@ -94,6 +94,7 @@ internal fun rememberQuickAddFormState(
         }
 
     var isProgrammaticallyUpdatingEnergy by rememberSaveable { mutableStateOf(false) }
+    var lastAutoEnergy by rememberSaveable { mutableStateOf(energy?.formatClipZeros()) }
 
     LaunchedEffect(autoCalculateEnergyState, proteinsForm, carbohydratesForm, fatsForm) {
         snapshotFlow {
@@ -112,6 +113,7 @@ internal fun rememberQuickAddFormState(
             .collectLatest {
                 isProgrammaticallyUpdatingEnergy = true
                 energyForm.textFieldState.setTextAndPlaceCursorAtEnd(it)
+                lastAutoEnergy = it
                 isProgrammaticallyUpdatingEnergy = false
             }
     }
@@ -120,7 +122,11 @@ internal fun rememberQuickAddFormState(
         snapshotFlow { energyForm.textFieldState.text }
             .drop(1)
             .collectLatest {
-                if (!isProgrammaticallyUpdatingEnergy && autoCalculateEnergyState.value) {
+                if (
+                    !isProgrammaticallyUpdatingEnergy &&
+                        autoCalculateEnergyState.value &&
+                        it != lastAutoEnergy
+                ) {
                     autoCalculateEnergyState.value = false
                 }
             }
