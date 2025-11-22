@@ -3,6 +3,7 @@ package com.maksimowiczm.foodyou.app.ui.food.diary.search
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LunchDining
+import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
@@ -21,6 +22,7 @@ import org.jetbrains.compose.resources.stringResource
 internal fun FoodDiarySearchFloatingActionButton(
     fabExpanded: Boolean,
     onFabExpandedChange: (Boolean) -> Unit,
+    onQuickAdd: () -> Unit,
     onCreateRecipe: () -> Unit,
     onCreateProduct: () -> Unit,
     modifier: Modifier = Modifier.Companion,
@@ -65,6 +67,15 @@ internal fun FoodDiarySearchFloatingActionButton(
             }
         },
     ) {
+        FloatingActionButtonMenuItem(
+            modifier = Modifier,
+            onClick = {
+                onQuickAdd()
+                onFabExpandedChange(false)
+            },
+            icon = { Icon(imageVector = Icons.Outlined.Bolt, contentDescription = null) },
+            text = { Text(stringResource(Res.string.headline_quick_add)) },
+        )
         FloatingActionButtonMenuItem(
             modifier = Modifier,
             onClick = {

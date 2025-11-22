@@ -31,8 +31,7 @@ internal fun QuickAddForm(state: QuickAddFormState, modifier: Modifier = Modifie
             state = state.name.textFieldState,
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(Res.string.product_name)) },
-            supportingText = { Text(stringResource(Res.string.neutral_required)) },
-            isError = state.name.error != null,
+            placeholder = { Text(stringResource(Res.string.headline_quick_add)) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
 
@@ -57,6 +56,11 @@ internal fun QuickAddForm(state: QuickAddFormState, modifier: Modifier = Modifie
                 val error = state.energy.error
                 if (error != null) {
                     Text(error.stringResource())
+                } else if (!state.hasAnyNutrients) {
+                    Text(
+                        text = stringResource(Res.string.warning_enter_calories_or_macros),
+                        color = MaterialTheme.colorScheme.error,
+                    )
                 }
             },
             suffix = { Text(stringResource(Res.string.unit_kcal)) },

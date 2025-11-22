@@ -218,4 +218,7 @@
     <string name="description_food_data_central_usda">FoodData Central ist USDA's umfassende Quelle von Daten zur Lebensmittelzusammensetzung mit mehreren unterschiedlichen Datentypen</string>
     <string name="error_usda_rate_limit">FoodData Central (USDA) API-Rate-Limit überschritten</string>
     <string name="description_swiss_food_composition_database_short">Die Schweizer Lebensmittelzusammensetzungsdatenbank enthält Nährwertangaben zu über 1.100 allgemeinen Lebensmitteln</string>
+    <string name="headline_quick_add">Schnell hinzufügen</string>
+    <string name="description_quick_add">Schneller Eintrag ohne Rezept oder Produkt.</string>
+    <string name="warning_enter_calories_or_macros">Bitte Kalorien oder Makros eingeben</string>
 </resources>

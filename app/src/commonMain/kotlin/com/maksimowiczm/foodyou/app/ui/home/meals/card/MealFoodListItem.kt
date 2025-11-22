@@ -126,53 +126,45 @@ internal fun MealFoodListItem(
 ) {
     val g = stringResource(Res.string.unit_gram_short)
 
-    val proteinsString = entry.proteins?.let { it.formatClipZeros("%.1f") + " $g" }
+    val dash = stringResource(Res.string.em_dash)
 
-    val carbohydratesString = entry.carbohydrates?.let { it.formatClipZeros("%.1f") + " $g" }
+    val proteinsString = entry.proteins?.let { it.formatClipZeros("%.1f") + " $g" } ?: dash
+    val carbohydratesString = entry.carbohydrates?.let { it.formatClipZeros("%.1f") + " $g" } ?: dash
+    val fatsString = entry.fats?.let { it.formatClipZeros("%.1f") + " $g" } ?: dash
+    val caloriesString =
+        entry.energy?.let { LocalEnergyFormatter.current.formatEnergy(it) } ?: dash
+    val name = entry.name.ifBlank { stringResource(Res.string.headline_quick_add) }
 
-    val fatsString = entry.fats?.let { it.formatClipZeros("%.1f") + " $g" }
-
-    val caloriesString = entry.energy?.let { LocalEnergyFormatter.current.formatEnergy(it) }
-
-    if (
-        proteinsString == null ||
-            carbohydratesString == null ||
-            fatsString == null ||
-            caloriesString == null
-    ) {
-        FoodErrorListItem(
-            headline = entry.name,
-            errorMessage = stringResource(Res.string.error_food_is_missing_required_fields),
-            modifier = modifier,
-        )
-    } else {
-        FoodListItem(
-            name = {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(entry.name)
-                    Icon(
-                        imageVector = Icons.Outlined.Bolt,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                    )
-                }
-            },
-            proteins = { Text(text = proteinsString, style = MaterialTheme.typography.bodySmall) },
-            carbohydrates = {
-                Text(text = carbohydratesString, style = MaterialTheme.typography.bodySmall)
-            },
-            fats = { Text(text = fatsString, style = MaterialTheme.typography.bodySmall) },
-            calories = { Text(text = caloriesString, style = MaterialTheme.typography.bodySmall) },
-            measurement = {},
-            isRecipe = false,
-            modifier = modifier,
-            containerColor = color,
-            contentColor = contentColor,
-            shape = shape,
-            contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
-        )
-    }
+    FoodListItem(
+        name = {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(name)
+                Icon(
+                    imageVector = Icons.Outlined.Bolt,
+                    contentDescription = stringResource(Res.string.headline_quick_add),
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        },
+        proteins = { Text(text = proteinsString, style = MaterialTheme.typography.bodySmall) },
+        carbohydrates = { Text(text = carbohydratesString, style = MaterialTheme.typography.bodySmall) },
+        fats = { Text(text = fatsString, style = MaterialTheme.typography.bodySmall) },
+        calories = { Text(text = caloriesString, style = MaterialTheme.typography.bodySmall) },
+        measurement = {
+            Text(
+                text = stringResource(Res.string.headline_quick_add),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+        },
+        isRecipe = false,
+        modifier = modifier,
+        containerColor = color,
+        contentColor = contentColor,
+        shape = shape,
+        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
+    )
 }

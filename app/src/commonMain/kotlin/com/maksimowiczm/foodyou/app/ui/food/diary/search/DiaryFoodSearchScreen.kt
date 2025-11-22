@@ -59,6 +59,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun DiaryFoodSearchScreen(
     onBack: () -> Unit,
+    onQuickAdd: () -> Unit,
     onCreateRecipe: () -> Unit,
     onCreateProduct: () -> Unit,
     onMeasure: (FoodId, Measurement) -> Unit,
@@ -134,6 +135,7 @@ fun DiaryFoodSearchScreen(
         FoodDiarySearchFloatingActionButton(
             fabExpanded = fabExpanded,
             onFabExpandedChange = { fabExpanded = it },
+            onQuickAdd = onQuickAdd,
             onCreateRecipe = onCreateRecipe,
             onCreateProduct = onCreateProduct,
             modifier =

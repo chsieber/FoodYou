@@ -5,13 +5,12 @@ import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.maksimowiczm.foodyou.app.ui.common.form.FormField
-import com.maksimowiczm.foodyou.app.ui.common.form.nonBlankStringValidator
 import com.maksimowiczm.foodyou.app.ui.common.form.nullableDoubleParser
 import com.maksimowiczm.foodyou.app.ui.common.form.rememberFormField
 import com.maksimowiczm.foodyou.app.ui.common.form.stringParser
 import com.maksimowiczm.foodyou.common.compose.utility.formatClipZeros
-import com.maksimowiczm.foodyou.common.domain.food.NutrientsHelper
 import foodyou.app.generated.resources.*
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import org.jetbrains.compose.resources.stringResource
@@ -24,9 +23,9 @@ internal enum class QuickAddFormFieldError {
     @Composable
     fun stringResource(): String =
         when (this) {
-            Required -> stringResource(Res.string.neutral_required)
+            Required -> stringResource(Res.string.warning_enter_calories_or_macros)
             InvalidNumber -> stringResource(Res.string.error_invalid_number)
-            NegativeNumber -> stringResource(Res.string.error_invalid_number)
+            NegativeNumber -> stringResource(Res.string.error_value_cannot_be_negative)
         }
 }
 
@@ -39,10 +38,10 @@ internal fun rememberQuickAddFormState(
     energy: Double? = null,
 ): QuickAddFormState {
     val name =
-        rememberFormField(
+        rememberFormField<String, QuickAddFormFieldError>(
             initialValue = name,
             parser = stringParser(),
-            validator = nonBlankStringValidator(onEmpty = { QuickAddFormFieldError.Required }),
+            validator = { null },
             textFieldState = rememberTextFieldState(name),
         )
 
@@ -88,19 +87,13 @@ internal fun rememberQuickAddFormState(
 
     val autoCalculateEnergyState =
         rememberSaveable(proteins, carbohydrates, fats, energy) {
-            val initialState =
-                if (energy == null || proteins == null || carbohydrates == null || fats == null) {
-                    true
-                } else {
-                    NutrientsHelper.calculateEnergy(
-                        proteins = proteins,
-                        carbohydrates = carbohydrates,
-                        fats = fats,
-                    ) == energy
-                }
+            val calculatedEnergy = calculateQuickAddEnergy(proteins, carbohydrates, fats)
+            val initialState = energy == null || calculatedEnergy == energy
 
             mutableStateOf(initialState)
         }
+
+    var isProgrammaticallyUpdatingEnergy by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(autoCalculateEnergyState, proteinsForm, carbohydratesForm, fatsForm) {
         snapshotFlow {
@@ -108,19 +101,29 @@ internal fun rememberQuickAddFormState(
                     return@snapshotFlow null
                 }
 
-                val proteinsValue = proteinsForm.value ?: 0.0
-                val carbohydratesValue = carbohydratesForm.value ?: 0.0
-                val fatsValue = fatsForm.value ?: 0.0
-
-                NutrientsHelper.calculateEnergy(
-                        proteins = proteinsValue,
-                        carbohydrates = carbohydratesValue,
-                        fats = fatsValue,
+                calculateQuickAddEnergy(
+                        proteins = proteinsForm.value,
+                        carbohydrates = carbohydratesForm.value,
+                        fats = fatsForm.value,
                     )
-                    .formatClipZeros()
+                    ?.formatClipZeros()
             }
             .filterNotNull()
-            .collectLatest { energyForm.textFieldState.setTextAndPlaceCursorAtEnd(it) }
+            .collectLatest {
+                isProgrammaticallyUpdatingEnergy = true
+                energyForm.textFieldState.setTextAndPlaceCursorAtEnd(it)
+                isProgrammaticallyUpdatingEnergy = false
+            }
+    }
+
+    LaunchedEffect(energyForm) {
+        snapshotFlow { energyForm.textFieldState.text }
+            .drop(1)
+            .collectLatest {
+                if (!isProgrammaticallyUpdatingEnergy && autoCalculateEnergyState.value) {
+                    autoCalculateEnergyState.value = false
+                }
+            }
     }
 
     return remember(
@@ -153,11 +156,18 @@ internal class QuickAddFormState(
 ) {
     var autoCalculateEnergy by autoCalculateEnergyState
 
+    val hasAnyNutrients by derivedStateOf {
+        energy.value != null ||
+            proteins.value != null ||
+            carbohydrates.value != null ||
+            fats.value != null
+    }
+
     val isValid by derivedStateOf {
-        name.error == null &&
-            proteins.error == null &&
+        proteins.error == null &&
             carbohydrates.error == null &&
             fats.error == null &&
-            energy.error == null
+            energy.error == null &&
+            hasAnyNutrients
     }
 }

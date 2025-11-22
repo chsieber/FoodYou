@@ -183,6 +183,9 @@ fun FoodYouAppNavHost(onDatabaseBackup: () -> Unit, modifier: Modifier = Modifie
 
             DiaryFoodSearchScreen(
                 onBack = { navController.popBackStackInclusive<FoodDiarySearch>() },
+                onQuickAdd = {
+                    navController.navigateSingleTop(FoodDiaryCreateQuickAdd(date, mealId))
+                },
                 onCreateRecipe = {
                     navController.navigateSingleTop(FoodDiaryCreateRecipe(date, mealId))
                 },

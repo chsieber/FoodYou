@@ -21,6 +21,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.maksimowiczm.foodyou.app.ui.common.component.ArrowBackIconButton
+import com.maksimowiczm.foodyou.app.ui.food.diary.component.ChipsDatePicker
+import com.maksimowiczm.foodyou.app.ui.food.diary.component.ChipsDatePickerState
+import com.maksimowiczm.foodyou.app.ui.food.diary.component.ChipsMealPicker
+import com.maksimowiczm.foodyou.app.ui.food.diary.component.ChipsMealPickerState
 import com.maksimowiczm.foodyou.common.compose.extension.add
 import foodyou.app.generated.resources.*
 import kotlinx.coroutines.delay
@@ -30,11 +34,14 @@ import org.jetbrains.compose.resources.stringResource
 internal fun QuickAddScreen(
     onBack: () -> Unit,
     onSave: () -> Unit,
+    dateState: ChipsDatePickerState,
+    mealState: ChipsMealPickerState,
     modifier: Modifier = Modifier,
     formState: QuickAddFormState = rememberQuickAddFormState(),
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val focusRequester = remember { FocusRequester() }
+    val canSave = formState.isValid && mealState.selectedMeal != null
 
     LaunchedEffect(Unit) {
         delay(100)
@@ -50,11 +57,11 @@ internal fun QuickAddScreen(
                 actions = {
                     FilledIconButton(
                         onClick = {
-                            if (formState.isValid) {
+                            if (canSave) {
                                 onSave()
                             }
                         },
-                        enabled = formState.isValid,
+                        enabled = canSave,
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Save,
@@ -79,7 +86,14 @@ internal fun QuickAddScreen(
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Spacer(Modifier.height(16.dp))
-                QuickAddForm(state = formState, modifier = Modifier.focusRequester(focusRequester))
+                ChipsDatePicker(state = dateState)
+                Spacer(Modifier.height(16.dp))
+                ChipsMealPicker(state = mealState)
+                Spacer(Modifier.height(16.dp))
+                QuickAddForm(
+                    state = formState,
+                    modifier = Modifier.focusRequester(focusRequester),
+                )
             }
         }
     }

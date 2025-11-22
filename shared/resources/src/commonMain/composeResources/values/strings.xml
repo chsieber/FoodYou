@@ -306,6 +306,7 @@
     <string name="action_try_again">Try again</string>
 
     <string name="description_calories_are_calculated">Energy is automatically calculated from macronutrients. You can disable this feature and enter the value manually if needed. Alcohol is not included in the calculation.</string>
+    <string name="warning_enter_calories_or_macros">Please enter calories or macros to save this entry</string>
     <string name="x_kcal_per_g">%1$s %2$d kcal/g</string>
 
     <string name="neutral_an_error_occurred">An error occurred</string>

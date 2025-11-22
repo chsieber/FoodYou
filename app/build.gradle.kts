@@ -178,6 +178,11 @@ android {
     }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
     buildTypes {
+        getByName("debug") {
+            applicationIdSuffix = ".my"
+            versionNameSuffix = "-my"
+            resValue("string", "app_name", "Food My")
+        }
         getByName("release") {
             isMinifyEnabled = true
             proguardFiles(

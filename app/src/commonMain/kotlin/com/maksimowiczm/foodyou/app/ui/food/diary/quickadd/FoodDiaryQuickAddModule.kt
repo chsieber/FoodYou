@@ -11,6 +11,7 @@ fun Module.foodDiaryQuickAdd() {
             mealId = mealId,
             date = date,
             manualDiaryEntryRepository = get(),
+            mealRepository = get(),
             dateProvider = get(),
         )
     }
